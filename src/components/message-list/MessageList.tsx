@@ -67,7 +67,16 @@ const Message: React.FC<MessageProps> = ({ message, isOwnMessage }) => {
             />
           </>
         ) : (
-          displayName
+          <>
+            <span>{displayName}</span>
+            <img
+              src={avatarURL}
+              width="48px"
+              height="48px"
+              alt=""
+              className="avatar-img"
+            />
+          </>
         )}
       </h4>
       <div>{text}</div>
