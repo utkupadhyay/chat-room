@@ -1,3 +1,6 @@
+/**
+ * Dummy data file for unit tests
+ */
 interface Room {
   id: string;
   title: string;

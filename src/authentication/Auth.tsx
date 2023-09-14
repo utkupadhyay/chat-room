@@ -23,9 +23,8 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
 
   const login = async () => {
     const user = await loginWithGoogle();
-
     if (!user) {
-      // TODO: Handle failed login
+      <>Invalid user. Trying logging in using a valid user.</>;
     }
 
     setUser(user);
