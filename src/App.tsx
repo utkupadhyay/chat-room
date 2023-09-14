@@ -8,7 +8,13 @@ import './App.css';
 
 function App() {
   const { user } = useAuth();
-  return user ? <AuthenticatedApp /> : <UnauthenticatedApp />;
+  return user ? (
+    <div>
+      <AuthenticatedApp />
+    </div>
+  ) : (
+    <UnauthenticatedApp />
+  );
 }
 
 export default App;

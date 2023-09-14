@@ -19,7 +19,7 @@ function MessageInput({ roomId }: MessageInputProps) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (user !== null) {
-      const displayName = user.displayName as string; // Type assertion
+      const displayName = user.displayName as string;
       sendMessage(roomId, { uid: user.uid, displayName }, value);
     }
     setValue('');

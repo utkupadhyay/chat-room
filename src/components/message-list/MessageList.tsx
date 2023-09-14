@@ -1,7 +1,8 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useContext, useLayoutEffect, useRef } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
-import useMessages  from '../../hooks/useMessages';
+import useMessages from '../../hooks/useMessages';
+import { AvatarContext } from '../../context/AvatarProvider';
 
 interface MessageListProps {
   roomId: string;
@@ -34,7 +35,12 @@ const MessageList: React.FC<MessageListProps> = ({ roomId }) => {
         {messages.map((msg) => (
           <Message
             key={msg.id}
-            message = {{id:msg.id, uid: msg.uid, displayName: msg.displayName, text:msg.text}}
+            message={{
+              id: msg.id,
+              uid: msg.uid,
+              displayName: msg.displayName,
+              text: msg.text,
+            }}
             isOwnMessage={msg.uid === user?.uid ?? ''}
           />
         ))}
@@ -44,10 +50,26 @@ const MessageList: React.FC<MessageListProps> = ({ roomId }) => {
 };
 
 const Message: React.FC<MessageProps> = ({ message, isOwnMessage }) => {
+  const { avatarURL } = useContext(AvatarContext);
   const { displayName, text } = message;
   return (
     <li className={['message', isOwnMessage && 'own-message'].join(' ')}>
-      <h4 className="sender">{isOwnMessage ? 'You' : displayName}</h4>
+      <h4 className="sender">
+        {isOwnMessage ? (
+          <>
+            <span>You</span>
+            <img
+              src={avatarURL}
+              width="48px"
+              height="48px"
+              alt=""
+              className="avatar-img"
+            />
+          </>
+        ) : (
+          displayName
+        )}
+      </h4>
       <div>{text}</div>
     </li>
   );

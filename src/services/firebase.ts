@@ -1,13 +1,25 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { addDoc, collection, getFirestore, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore';
+import {
+  browserSessionPersistence,
+  getAuth,
+  GoogleAuthProvider,
+  setPersistence,
+  signInWithPopup,
+} from 'firebase/auth';
+import {
+  addDoc,
+  collection,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { getDownloadURL, getStorage, listAll, ref } from 'firebase/storage';
 
 import 'firebase/firestore';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: 'AIzaSyAEe6f5kb6MX0FxSBy1LtYxsnPF6Ngcvxk',
   authDomain: 'chat-app-a1031.firebaseapp.com',
@@ -20,6 +32,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 interface UserResult {
   uid: string;
   displayName: string | null;
@@ -29,7 +42,7 @@ async function loginWithGoogle(): Promise<UserResult | null> {
   try {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
-
+    await setPersistence(auth, browserSessionPersistence);
     const { user } = await signInWithPopup(auth, provider);
 
     if (!user) {
@@ -86,4 +99,40 @@ const getMessages = (
   );
 };
 
-export { loginWithGoogle, sendMessage, getMessages };
+const getChatRooms = async () => {
+  try {
+    const chatRoomsSnapshot = await getDocs(collection(db, 'chat-room-data'));
+    const chatRooms = chatRoomsSnapshot.docs.map((room) => ({
+      ...room.data(),
+    }));
+    return chatRooms;
+  } catch (e) {
+    console.error('Failed to fetch data');
+  }
+};
+
+const getAllFileUrls = async (storageName: string) => {
+  const storage = getStorage();
+  const storageRef = ref(storage, storageName);
+
+  try {
+    const { items } = await listAll(storageRef);
+    const urls = await Promise.all(
+      items.map(async (item) => {
+        const url = await getDownloadURL(item);
+        return url;
+      })
+    );
+    return urls;
+  } catch (error) {
+    console.error(`Failed to get file URLs. ${error}`);
+  }
+};
+
+export {
+  loginWithGoogle,
+  sendMessage,
+  getMessages,
+  getChatRooms,
+  getAllFileUrls,
+};
